@@ -1,58 +1,22 @@
 import { useState } from 'react';
 import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useSanityData } from '../hooks/useSanityData';
+import { queries } from '../lib/sanity';
 
-const reviews = [
-  {
-    name: 'Marie D.',
-    rating: 5,
-    comment: 'Cuisine authentique et délicieuse ! Le poulet caramel est un vrai régal. Accueil chaleureux.'
-  },
-  {
-    name: 'Thomas L.',
-    rating: 5,
-    comment: 'Excellent rapport qualité-prix. La terrasse est très agréable en été. Je recommande vivement !'
-  },
-  {
-    name: 'Sophie M.',
-    rating: 5,
-    comment: 'Les meilleurs plats chinois de Marseille ! Produits frais et service impeccable.'
-  },
-  {
-    name: 'Pierre B.',
-    rating: 5,
-    comment: 'Ambiance familiale et authentique. Les gambas au sel et poivre sont exceptionnelles.'
-  },
-  {
-    name: 'Léa C.',
-    rating: 5,
-    comment: 'Un vrai voyage en Chine ! Portions généreuses et saveurs incroyables. On y retourne souvent.'
-  },
-  {
-    name: 'Ahmed K.',
-    rating: 5,
-    comment: 'Proche de la gare, pratique et délicieux. Le bœuf thaï est mon plat préféré !'
-  },
-  {
-    name: 'Claire R.',
-    rating: 5,
-    comment: 'Décor typique et chaleureux. La cuisine maison fait toute la différence. Bravo !'
-  },
-  {
-    name: 'Lucas P.',
-    rating: 5,
-    comment: 'Service rapide et souriant. Les nouilles sautées sont parfaitement cuisinées. Top !'
-  },
-  {
-    name: 'Emma T.',
-    rating: 5,
-    comment: 'Restaurant familial comme on les aime. Qualité constante et prix doux.'
-  }
-];
+interface Review {
+  _id: string;
+  name: string;
+  rating: number;
+  comment: string;
+}
 
 export default function Reviews() {
+  const { data: reviews } = useSanityData<Review[]>(queries.reviews);
   const [currentPage, setCurrentPage] = useState(0);
+  
   const reviewsPerPage = 3;
-  const totalPages = Math.ceil(reviews.length / reviewsPerPage);
+  const reviewList = reviews || [];
+  const totalPages = Math.ceil(reviewList.length / reviewsPerPage);
 
   const nextPage = () => {
     setCurrentPage((prev) => (prev + 1) % totalPages);
@@ -62,10 +26,20 @@ export default function Reviews() {
     setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
   };
 
-  const currentReviews = reviews.slice(
+  const currentReviews = reviewList.slice(
     currentPage * reviewsPerPage,
     (currentPage + 1) * reviewsPerPage
   );
+
+  if (!reviewList.length) {
+    return (
+      <section id="avis" className="py-20 relative overflow-hidden" style={{ backgroundColor: 'var(--bg)' }}>
+        <div className="text-center">
+          <p style={{ color: 'var(--text)' }}>Chargement des avis...</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="avis" className="py-20 relative overflow-hidden" style={{ backgroundColor: 'var(--bg)' }}>
@@ -97,7 +71,7 @@ export default function Reviews() {
           <div className="grid md:grid-cols-3 gap-6">
             {currentReviews.map((review, index) => (
               <div
-                key={`${currentPage}-${index}`}
+                key={review._id}
                 className="group"
                 style={{ animation: 'fadeIn 0.5s ease-out' }}
               >

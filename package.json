@@ -8,9 +8,13 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "sanity": "cd sanity-studio && sanity dev",
+    "sanity-deploy": "cd sanity-studio && sanity deploy"
   },
   "dependencies": {
+    "@sanity/client": "^7.12.0",
+    "@sanity/image-url": "^1.2.0",
     "@supabase/supabase-js": "^2.57.4",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",

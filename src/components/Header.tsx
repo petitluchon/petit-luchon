@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Phone, Menu, X } from 'lucide-react';
+import { useSanityData } from '../hooks/useSanityData';
+import { queries, urlFor } from '../lib/sanity';
+
+interface RestaurantInfo {
+  logo: any;
+  phone: string;
+}
 
 export default function Header() {
+  const { data } = useSanityData<RestaurantInfo>(queries.restaurantInfo);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -29,6 +37,12 @@ export default function Header() {
     setIsMobileMenuOpen(false);
   };
 
+  const logoUrl = data?.logo
+    ? urlFor(data.logo).width(200).url()
+    : 'https://lh3.googleusercontent.com/pw/AP1GczMmk4jw4Y7ZAIJ0J7sslY4jOn18rIIp72PveX7Dvv_Q4EOdzo2UJ2Zb3ZFZwrOlcR6RCNl1CnHkRZDbP7u_Wn2972EGzfa57xJtexr-Qgj9iT2E_OFIc32-aFxT2NiTE2cowXGbjX7omxPTCeMDcQxx=w958-h958-s-no-gm?authuser=1';
+
+  const phoneNumber = data?.phone || '06 25 43 01 38';
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
@@ -49,7 +63,7 @@ export default function Header() {
             style={{ color: 'var(--header-text)' }}
           >
             <img
-              src="https://lh3.googleusercontent.com/pw/AP1GczMmk4jw4Y7ZAIJ0J7sslY4jOn18rIIp72PveX7Dvv_Q4EOdzo2UJ2Zb3ZFZwrOlcR6RCNl1CnHkRZDbP7u_Wn2972EGzfa57xJtexr-Qgj9iT2E_OFIc32-aFxT2NiTE2cowXGbjX7omxPTCeMDcQxx=w958-h958-s-no-gm?authuser=1"
+              src={logoUrl}
               alt="Petit Luchon"
               className="h-16 w-auto object-contain"
             />
@@ -90,9 +104,9 @@ export default function Header() {
             <button onClick={() => scrollToSection('commander')} className="btn-light text-sm sm:text-base px-4 sm:px-6 py-2">
               Commander
             </button>
-            <a href="tel:+33625430138" className="hidden lg:flex items-center gap-2 hover:opacity-70 transition-opacity ml-6">
+            <a href={`tel:+33${phoneNumber.replace(/\s/g, '').substring(1)}`} className="hidden lg:flex items-center gap-2 hover:opacity-70 transition-opacity ml-6">
               <Phone size={18} />
-              <span className="font-medium">06 25 43 01 38</span>
+              <span className="font-medium">{phoneNumber}</span>
             </a>
           </div>
         </div>
@@ -118,9 +132,9 @@ export default function Header() {
               >
                 Avis
               </button>
-              <a href="tel:+33625430138" className="flex items-center gap-2 hover:opacity-70 transition-opacity py-2">
+              <a href={`tel:+33${phoneNumber.replace(/\s/g, '').substring(1)}`} className="flex items-center gap-2 hover:opacity-70 transition-opacity py-2">
                 <Phone size={18} />
-                <span className="font-medium">06 25 43 01 38</span>
+                <span className="font-medium">{phoneNumber}</span>
               </a>
               <button onClick={() => scrollToSection('reserver')} className="btn-light text-left py-2">
                 Réserver

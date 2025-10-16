@@ -1,20 +1,33 @@
 import { useState } from 'react';
 import { X, ShoppingBag, Truck } from 'lucide-react';
+import { useSanityData } from '../hooks/useSanityData';
+import { queries } from '../lib/sanity';
+
+interface RestaurantInfo {
+  orderingInfo: {
+    uberEatsLink: string;
+    smsNumber: string;
+  };
+}
 
 export default function Commander() {
+  const { data } = useSanityData<RestaurantInfo>(queries.restaurantInfo);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [orderDetails, setOrderDetails] = useState('');
 
+  const smsNumber = data?.orderingInfo?.smsNumber || '+33625430138';
+  const uberEatsLink = data?.orderingInfo?.uberEatsLink || 'https://www.ubereats.com/fr/store/petit-luchon/kGkAMOx3R_mgG5ccDqZ-QA?diningMode=DELIVERY&surfaceName=';
+
   const handleSendSMS = () => {
-    const phoneNumber = '+33625430138';
     const message = encodeURIComponent(orderDetails);
-    const smsLink = `sms:${phoneNumber}${navigator.userAgent.includes('iPhone') ? '&' : '?'}body=${message}`;
+    const smsLink = `sms:${smsNumber}${navigator.userAgent.includes('iPhone') ? '&' : '?'}body=${message}`;
 
     window.location.href = smsLink;
   };
 
   const copyNumber = () => {
-    navigator.clipboard.writeText('06 25 43 01 38');
+    const displayNumber = smsNumber.replace('+33', '0');
+    navigator.clipboard.writeText(displayNumber);
     alert('Numéro copié !');
   };
 
@@ -72,7 +85,7 @@ export default function Commander() {
               Livraison rapide à domicile
             </p>
             <a
-              href="https://www.ubereats.com/fr/store/petit-luchon/kGkAMOx3R_mgG5ccDqZ-QA?diningMode=DELIVERY&surfaceName="
+              href={uberEatsLink}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-secondary w-full block"
@@ -103,7 +116,7 @@ export default function Commander() {
 
             <p className="mb-6 text-lg" style={{ color: 'var(--text)', opacity: 0.9 }}>
               Envoyez votre commande au <br className="sm:hidden" />
-              <strong>06 25 43 01 38</strong>
+              <strong>{smsNumber.replace('+33', '0')}</strong>
             </p>
 
             <div className="mb-6">
