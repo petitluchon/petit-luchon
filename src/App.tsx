@@ -21,11 +21,11 @@ function MainSite() {
       <Header />
       <main>
         <Hero />
-        <About />
         <BestSellers />
-        <Reviews />
-        <Reservation />
         <Commander />
+        <About />
+        <Reservation />
+        <Reviews />
         <Map />
       </main>
       <Footer />
