@@ -11,34 +11,47 @@ export default function Reservation() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitMessage('');
 
-    const emailBody = `
-Nouvelle réservation - Petit Luchon
-
-Nom: ${formData.name}
-Téléphone: ${formData.phone}
-Date: ${formData.date}
-Nombre de personnes: ${formData.guests}
-    `.trim();
-
-    console.log('Réservation:', emailBody);
-
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSubmitMessage('Réservation envoyée ! Nous vous contacterons bientôt.');
-      setFormData({
-        name: '',
-        phone: '',
-        date: '',
-        guests: '3'
+    try {
+      const response = await fetch('/api/send-reservation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       });
 
-      setTimeout(() => setSubmitMessage(''), 5000);
-    }, 1000);
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessageType('success');
+        setSubmitMessage('✅ Réservation envoyée avec succès ! Nous vous contacterons bientôt.');
+        setFormData({
+          name: '',
+          phone: '',
+          date: '',
+          guests: '3'
+        });
+
+        // Masquer le message après 5 secondes
+        setTimeout(() => setSubmitMessage(''), 5000);
+      } else {
+        setMessageType('error');
+        setSubmitMessage('❌ Une erreur est survenue. Veuillez réessayer ou nous appeler directement.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setMessageType('error');
+      setSubmitMessage('❌ Erreur de connexion. Veuillez vérifier votre connexion internet et réessayer.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -69,6 +82,7 @@ Nombre de personnes: ${formData.guests}
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Votre nom"
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -82,6 +96,7 @@ Nombre de personnes: ${formData.guests}
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   placeholder="06 12 34 56 78"
+                  disabled={isSubmitting}
                 />
               </div>
             </div>
@@ -97,6 +112,7 @@ Nombre de personnes: ${formData.guests}
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                 min={new Date().toISOString().split('T')[0]}
+                disabled={isSubmitting}
               />
             </div>
 
@@ -109,6 +125,7 @@ Nombre de personnes: ${formData.guests}
                 required
                 value={formData.guests}
                 onChange={(e) => setFormData({ ...formData, guests: e.target.value })}
+                disabled={isSubmitting}
               >
                 <option value="3">3 personnes</option>
                 <option value="4">4 personnes</option>
@@ -134,7 +151,13 @@ Nombre de personnes: ${formData.guests}
             {submitMessage && (
               <div
                 className="p-4 rounded-lg text-center font-semibold"
-                style={{ backgroundColor: 'rgba(247, 244, 239, 0.1)', color: 'var(--text)' }}
+                style={{ 
+                  backgroundColor: messageType === 'success' 
+                    ? 'rgba(34, 197, 94, 0.1)' 
+                    : 'rgba(239, 68, 68, 0.1)',
+                  color: 'var(--text)',
+                  border: `2px solid ${messageType === 'success' ? '#22c55e' : '#ef4444'}`
+                }}
               >
                 {submitMessage}
               </div>
