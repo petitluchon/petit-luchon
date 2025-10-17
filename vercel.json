@@ -1,0 +1,19 @@
+{
+  "rewrites": [
+    {
+      "source": "/studio/:path*",
+      "destination": "https://petit-luchon.sanity.studio/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/studio/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "ALLOWALL"
+        }
+      ]
+    }
+  ]
+}
